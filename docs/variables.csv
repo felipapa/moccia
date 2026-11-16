@@ -1,0 +1,144 @@
+﻿Nombre,Direccion,Tipo,Grupo,Descripcion,HMI
+ORDEN_MARCHA_FISICA,X0,BOOL,Entrada,Selector de marcha mantenido. 1 = operador pide marcha,R
+CADENA_SEGURIDAD,X1,BOOL,Entrada,"Cadena de emergencia. Contacto NC: 1 = OK, 0 = emergencia o cable cortado",R
+HAB_FISICA_Z1,X2,BOOL,Entrada,Habilitacion fisica zona 1 (1 = habilitada),R
+HAB_FISICA_Z2,X3,BOOL,Entrada,Habilitacion fisica zona 2 (1 = habilitada),R
+HAB_FISICA_Z3,X4,BOOL,Entrada,Habilitacion fisica zona 3 (1 = habilitada),R
+HAB_FISICA_Z4,X5,BOOL,Entrada,Habilitacion fisica zona 4 (1 = habilitada),R
+RESET_FISICO,X6,BOOL,Entrada,Pulsador de reset NO (rearme / reset de fallas),R
+FALLA_VFD,X7,BOOL,Entrada,Rele de falla del variador. 1 = falla (ver nota de polaridad en README),R
+ORDEN_MARCHA_VFD,Y0,BOOL,Salida,Orden de marcha al variador. Solo con AUTORIZACION_VARIADOR y MARCHA_SOSTENIDA,R
+HAB_CALENTADORES,Y1,BOOL,Salida,"Habilita la potencia de calentamiento (sin emergencia, sin sobretemperatura, >=1 zona habilitada)",R
+RESET_FALLA_VFD,Y2,BOOL,Salida,Pulso de reset hacia el variador (duracion TIEMPO_RESET_VFD),R
+ALARMA_GENERAL_OUT,Y3,BOOL,Salida,Baliza/bocina: refleja ALARMA_GENERAL,R
+SEGURIDAD_OK,M0,BOOL,Seguridad,Copia de X1: cadena de seguridad cerrada,R
+EMERGENCIA_ACTIVA,M1,BOOL,Seguridad,Emergencia activa (X1 = 0),R
+REARME_REQUERIDO,M2,BOOL,Seguridad,Se pone al energizar y ante emergencia. Se borra con reset si X1=1 y X0=0,R
+PULSO_RESET,M3,BOOL,Seguridad,Pulso de 1 scan por X6 o M90,-
+FLANCO_X0,M21,BOOL,Control,Pulso de 1 scan al subir X0,-
+FALLA_LATCH,M6,BOOL,Seguridad,Falla del variador enclavada hasta reset,R
+SOBRETEMP_LATCH,M87,BOOL,Seguridad,Sobretemperatura enclavada hasta reset,R
+COMM_PV_OK,M7,BOOL,Comunicacion,Datos de temperatura frescos (latido PV vigente) o supervision desactivada,R
+COMM_HMI_OK,M8,BOOL,Comunicacion,Latido de HMI vigente o supervision desactivada,R
+FALLA_VFD_ESPEJO,M9,BOOL,Diagnostico,Copia de X7 para la HMI,R
+PULSO_DATO_PV,M10,BOOL,Comunicacion,Cambio detectado en PV_HEARTBEAT (1 scan),-
+PULSO_DATO_HMI,M11,BOOL,Comunicacion,Cambio detectado en HMI_HEARTBEAT (1 scan),-
+ANY_ZONA_HAB,M12,BOOL,Control,Al menos una zona habilitada,R
+ALGUNA_ZONA_BLOQUEA,M13,BOOL,Control,Alguna zona habilitada impide la marcha,R
+ALGUNA_SOBRETEMP,M14,BOOL,Control,Alguna PV valida supera LIMITE_SOBRETEMP,R
+AUTORIZACION_VARIADOR,M16,BOOL,Control,Permiso general de marcha (todas las condiciones),R
+MARCHA_SOSTENIDA,M17,BOOL,Control,Marcha en curso. Arranca con FLANCO_X0 + autorizacion; cae si cae la autorizacion,R
+MARCHA_BLOQUEADA,M18,BOOL,Control,Operador pide marcha (X0) pero no hay autorizacion,R
+ALARMA_GENERAL,M19,BOOL,Alarmas,Cualquier alarma activa,R
+RESET_VFD_EN_CURSO,M20,BOOL,Control,Pulso de reset al variador en curso,R
+ALM_COMM_PV,M81,BOOL,Alarmas,Sin datos de temperatura (timeout),R
+ALM_COMM_HMI,M82,BOOL,Alarmas,Sin latido de HMI (timeout),R
+ALM_NINGUNA_ZONA,M84,BOOL,Alarmas,Ninguna zona habilitada,R
+PV_HB_VISTO,M85,BOOL,Comunicacion,Se recibio al menos un latido PV desde el ultimo timeout,-
+HMI_HB_VISTO,M86,BOOL,Comunicacion,Se recibio al menos un latido HMI desde el ultimo timeout,-
+INIT_PULSO,M89,BOOL,Sistema,Scan de inicializacion de parametros,-
+RESET_HMI,M90,BOOL,HMI,Boton de reset en pantalla (accion SET; el PLC lo borra),W
+ZONA_HABILITADA_Z1,M30,BOOL,Zona 1,Zona habilitada = X fisica AND solicitud HMI,R
+ZONA_SIN_HAB_FISICA_Z1,M31,BOOL,Zona 1,HMI pide la zona pero falta la habilitacion fisica,R
+SP_VALIDO_Z1,M32,BOOL,Zona 1,SP_MINIMO <= SP <= SP_MAXIMO,R
+PV_VALIDA_Z1,M33,BOOL,Zona 1,PV fresca (COMM_PV_OK) y dentro de rango plausible,R
+ZONA_EN_VENTANA_Z1,M34,BOOL,Zona 1,|PV-SP| <= BANDA_TOLERANCIA,R
+ZONA_LISTA_Z1,M35,BOOL,Zona 1,En ventana durante TIEMPO_ESTABILIDAD,R
+VENTANA_ADMITIDA_Z1,M36,BOOL,Zona 1,"ZONA_LISTA, o marcha en curso, o EXIGIR_VENTANA=0",R
+ZONA_BLOQUEA_Z1,M37,BOOL,Zona 1,"Zona habilitada con SP invalido, PV invalida o fuera de ventana",R
+ALM_SP_INVALIDO_Z1,M38,BOOL,Zona 1,Zona habilitada con SP fuera de limites,R
+ALM_PV_INVALIDA_Z1,M39,BOOL,Zona 1,Zona habilitada sin PV valida,R
+ZONA_HABILITADA_Z2,M40,BOOL,Zona 2,Zona habilitada = X fisica AND solicitud HMI,R
+ZONA_SIN_HAB_FISICA_Z2,M41,BOOL,Zona 2,HMI pide la zona pero falta la habilitacion fisica,R
+SP_VALIDO_Z2,M42,BOOL,Zona 2,SP_MINIMO <= SP <= SP_MAXIMO,R
+PV_VALIDA_Z2,M43,BOOL,Zona 2,PV fresca (COMM_PV_OK) y dentro de rango plausible,R
+ZONA_EN_VENTANA_Z2,M44,BOOL,Zona 2,|PV-SP| <= BANDA_TOLERANCIA,R
+ZONA_LISTA_Z2,M45,BOOL,Zona 2,En ventana durante TIEMPO_ESTABILIDAD,R
+VENTANA_ADMITIDA_Z2,M46,BOOL,Zona 2,"ZONA_LISTA, o marcha en curso, o EXIGIR_VENTANA=0",R
+ZONA_BLOQUEA_Z2,M47,BOOL,Zona 2,"Zona habilitada con SP invalido, PV invalida o fuera de ventana",R
+ALM_SP_INVALIDO_Z2,M48,BOOL,Zona 2,Zona habilitada con SP fuera de limites,R
+ALM_PV_INVALIDA_Z2,M49,BOOL,Zona 2,Zona habilitada sin PV valida,R
+ZONA_HABILITADA_Z3,M50,BOOL,Zona 3,Zona habilitada = X fisica AND solicitud HMI,R
+ZONA_SIN_HAB_FISICA_Z3,M51,BOOL,Zona 3,HMI pide la zona pero falta la habilitacion fisica,R
+SP_VALIDO_Z3,M52,BOOL,Zona 3,SP_MINIMO <= SP <= SP_MAXIMO,R
+PV_VALIDA_Z3,M53,BOOL,Zona 3,PV fresca (COMM_PV_OK) y dentro de rango plausible,R
+ZONA_EN_VENTANA_Z3,M54,BOOL,Zona 3,|PV-SP| <= BANDA_TOLERANCIA,R
+ZONA_LISTA_Z3,M55,BOOL,Zona 3,En ventana durante TIEMPO_ESTABILIDAD,R
+VENTANA_ADMITIDA_Z3,M56,BOOL,Zona 3,"ZONA_LISTA, o marcha en curso, o EXIGIR_VENTANA=0",R
+ZONA_BLOQUEA_Z3,M57,BOOL,Zona 3,"Zona habilitada con SP invalido, PV invalida o fuera de ventana",R
+ALM_SP_INVALIDO_Z3,M58,BOOL,Zona 3,Zona habilitada con SP fuera de limites,R
+ALM_PV_INVALIDA_Z3,M59,BOOL,Zona 3,Zona habilitada sin PV valida,R
+ZONA_HABILITADA_Z4,M60,BOOL,Zona 4,Zona habilitada = X fisica AND solicitud HMI,R
+ZONA_SIN_HAB_FISICA_Z4,M61,BOOL,Zona 4,HMI pide la zona pero falta la habilitacion fisica,R
+SP_VALIDO_Z4,M62,BOOL,Zona 4,SP_MINIMO <= SP <= SP_MAXIMO,R
+PV_VALIDA_Z4,M63,BOOL,Zona 4,PV fresca (COMM_PV_OK) y dentro de rango plausible,R
+ZONA_EN_VENTANA_Z4,M64,BOOL,Zona 4,|PV-SP| <= BANDA_TOLERANCIA,R
+ZONA_LISTA_Z4,M65,BOOL,Zona 4,En ventana durante TIEMPO_ESTABILIDAD,R
+VENTANA_ADMITIDA_Z4,M66,BOOL,Zona 4,"ZONA_LISTA, o marcha en curso, o EXIGIR_VENTANA=0",R
+ZONA_BLOQUEA_Z4,M67,BOOL,Zona 4,"Zona habilitada con SP invalido, PV invalida o fuera de ventana",R
+ALM_SP_INVALIDO_Z4,M68,BOOL,Zona 4,Zona habilitada con SP fuera de limites,R
+ALM_PV_INVALIDA_Z4,M69,BOOL,Zona 4,Zona habilitada sin PV valida,R
+ALM_SOBRETEMP_Z1,M70,BOOL,Zona 1,PV valida > LIMITE_SOBRETEMP,R
+ALM_SOBRETEMP_Z2,M71,BOOL,Zona 2,PV valida > LIMITE_SOBRETEMP,R
+ALM_SOBRETEMP_Z3,M72,BOOL,Zona 3,PV valida > LIMITE_SOBRETEMP,R
+ALM_SOBRETEMP_Z4,M73,BOOL,Zona 4,PV valida > LIMITE_SOBRETEMP,R
+HAB_FISICA_ESPEJO_Z1,M74,BOOL,Zona 1,Copia de la entrada de habilitacion para la HMI,R
+HAB_FISICA_ESPEJO_Z2,M75,BOOL,Zona 2,Copia de la entrada de habilitacion para la HMI,R
+HAB_FISICA_ESPEJO_Z3,M76,BOOL,Zona 3,Copia de la entrada de habilitacion para la HMI,R
+HAB_FISICA_ESPEJO_Z4,M77,BOOL,Zona 4,Copia de la entrada de habilitacion para la HMI,R
+SOLICITUD_HMI_Z1,M500,BOOL,HMI (retentiva),Solicitud de habilitacion zona 1 desde la HMI (boton alternado),RW
+SOLICITUD_HMI_Z2,M501,BOOL,HMI (retentiva),Solicitud de habilitacion zona 2 desde la HMI (boton alternado),RW
+SOLICITUD_HMI_Z3,M502,BOOL,HMI (retentiva),Solicitud de habilitacion zona 3 desde la HMI (boton alternado),RW
+SOLICITUD_HMI_Z4,M503,BOOL,HMI (retentiva),Solicitud de habilitacion zona 4 desde la HMI (boton alternado),RW
+EXIGIR_VENTANA,M504,BOOL,Config (retentiva),1 = para arrancar cada zona habilitada debe estar estable dentro de la banda,RW
+CONFIG_INICIALIZADA,M505,BOOL,Config (retentiva),1 = parametros ya cargados. Poner a 0 restaura valores por defecto,-
+PV_HB_EN,M506,BOOL,Config (retentiva),1 = supervisar latido PV (recomendado). 0 = solo rango plausible (RIESGO),-
+HMI_HB_EN,M507,BOOL,Config (retentiva),1 = supervisar latido de HMI,-
+SP_MINIMO,D200,INT16,Config (retentivo),"Minimo SP permitido (0,1 C). Inicial 5,0 C. Defecto 50",RW
+SP_MAXIMO,D201,INT16,Config (retentivo),"Maximo SP permitido (0,1 C). Defecto 3500",RW
+BANDA_TOLERANCIA,D202,INT16,Config (retentivo),"Banda |PV-SP| para ventana de arranque (0,1 C). Defecto 50",RW
+TIEMPO_ESTABILIDAD,D203,INT16,Config (retentivo),"Permanencia en banda (0,1 s). 300 = 30 s. Defecto 300",RW
+TIMEOUT_COMM_PV,D204,INT16,Config (retentivo),"Sin latido PV (0,1 s). 50 = 5 s. Defecto 50",RW
+PV_MIN_PLAUSIBLE,D205,INT16,Config (retentivo),"PV minima valida (0,1 C). Defecto -200",RW
+PV_MAX_PLAUSIBLE,D206,INT16,Config (retentivo),"PV maxima valida (0,1 C). Debe ser >= LIMITE_SOBRETEMP. Defecto 5000",RW
+TIMEOUT_HMI,D207,INT16,Config (retentivo),"Sin latido HMI (0,1 s). 100 = 10 s. Defecto 100",RW
+LIMITE_SOBRETEMP,D208,INT16,Config (retentivo),"Sobretemperatura absoluta (0,1 C). Defecto 4000",RW
+TIEMPO_RESET_VFD,D209,INT16,Config (retentivo),"Duracion del pulso de reset al variador (0,1 s). Defecto 10",RW
+SP_ZONA_1,D210,INT16,Proceso (retentivo),"Setpoint zona 1 (0,1 C). Escribe la HMI. Inicial 0 = invalido hasta que se cargue",RW
+SP_ZONA_2,D211,INT16,Proceso (retentivo),"Setpoint zona 2 (0,1 C). Escribe la HMI. Inicial 0 = invalido hasta que se cargue",RW
+SP_ZONA_3,D212,INT16,Proceso (retentivo),"Setpoint zona 3 (0,1 C). Escribe la HMI. Inicial 0 = invalido hasta que se cargue",RW
+SP_ZONA_4,D213,INT16,Proceso (retentivo),"Setpoint zona 4 (0,1 C). Escribe la HMI. Inicial 0 = invalido hasta que se cargue",RW
+PV_CRUDA_Z1,D0,INT16,Proceso,"Temperatura zona 1 recibida (0,1 C). La escribe el gateway/HMI",W
+PV_CRUDA_Z2,D1,INT16,Proceso,"Temperatura zona 2 recibida (0,1 C). La escribe el gateway/HMI",W
+PV_CRUDA_Z3,D2,INT16,Proceso,"Temperatura zona 3 recibida (0,1 C). La escribe el gateway/HMI",W
+PV_CRUDA_Z4,D3,INT16,Proceso,"Temperatura zona 4 recibida (0,1 C). La escribe el gateway/HMI",W
+PV_ZONA_1,D4,INT16,Proceso,"PV para mostrar: PV_CRUDA si es valida, -9999 si no (nunca un dato viejo)",R
+PV_ZONA_2,D5,INT16,Proceso,"PV para mostrar: PV_CRUDA si es valida, -9999 si no (nunca un dato viejo)",R
+PV_ZONA_3,D6,INT16,Proceso,"PV para mostrar: PV_CRUDA si es valida, -9999 si no (nunca un dato viejo)",R
+PV_ZONA_4,D7,INT16,Proceso,"PV para mostrar: PV_CRUDA si es valida, -9999 si no (nunca un dato viejo)",R
+DESVIO_Z1,D8,INT16,Proceso,"PV - SP zona 1 (0,1 C)",R
+DESVIO_Z2,D9,INT16,Proceso,"PV - SP zona 2 (0,1 C)",R
+DESVIO_Z3,D10,INT16,Proceso,"PV - SP zona 3 (0,1 C)",R
+DESVIO_Z4,D11,INT16,Proceso,"PV - SP zona 4 (0,1 C)",R
+DESVIO_ABS_Z1,D12,INT16,Proceso,"|PV - SP| zona 1 (0,1 C)",-
+DESVIO_ABS_Z2,D13,INT16,Proceso,"|PV - SP| zona 2 (0,1 C)",-
+DESVIO_ABS_Z3,D14,INT16,Proceso,"|PV - SP| zona 3 (0,1 C)",-
+DESVIO_ABS_Z4,D15,INT16,Proceso,"|PV - SP| zona 4 (0,1 C)",-
+HMI_HEARTBEAT,D20,INT16,Comunicacion,Contador que la HMI cambia periodicamente,W
+HMI_HEARTBEAT_COPIA,D21,INT16,Comunicacion,Ultima copia vista por el PLC,-
+PV_HEARTBEAT,D22,INT16,Comunicacion,Contador que el gateway/HMI cambia con cada actualizacion de PV,W
+PV_HEARTBEAT_COPIA,D23,INT16,Comunicacion,Ultima copia vista por el PLC,-
+MINUTOS_MARCHA,D24,INT16,Diagnostico,Minutos con Y0 activa desde el arranque del PLC,R
+SEGUNDOS_AUX,D25,INT16,Diagnostico,Auxiliar del contador de minutos,-
+MOTIVO_BLOQUEO,D30,INT16,Diagnostico,Codigo del motivo por el que no se permite la marcha (ver tabla),R
+ESTADO_VARIADOR,D31,INT16,Diagnostico,0=parado 1=marcha 2=falla 3=bloqueado,R
+T_COMM_PV,T0,TIMER 100ms,Temporizador,Timeout de latido PV (valor en D204),-
+T_COMM_HMI,T1,TIMER 100ms,Temporizador,Timeout de latido HMI (valor en D207),-
+T_RESET_VFD,T2,TIMER 100ms,Temporizador,Duracion del pulso de reset (valor en D209),-
+T_ESTAB_Z1,T10,TIMER 100ms,Temporizador,Estabilidad zona 1 (valor en D203),-
+T_ESTAB_Z2,T11,TIMER 100ms,Temporizador,Estabilidad zona 2 (valor en D203),-
+T_ESTAB_Z3,T12,TIMER 100ms,Temporizador,Estabilidad zona 3 (valor en D203),-
+T_ESTAB_Z4,T13,TIMER 100ms,Temporizador,Estabilidad zona 4 (valor en D203),-
+M8000,M8000,BOOL,Sistema,ON durante RUN,-
+M8002,M8002,BOOL,Sistema,Pulso del primer scan en RUN,-
+M8013,M8013,BOOL,Sistema,Reloj de 1 s,-
