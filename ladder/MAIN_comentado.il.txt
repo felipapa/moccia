@@ -1,0 +1,491 @@
+; Programa MAIN - FX3U / Coolmay L02-24MT - lista de instrucciones
+; Las lineas que empiezan con ; o ## son comentarios para el lector.
+
+## SEGMENTO 1 - INICIALIZACION (solo la primera vez o al poner M505 a 0)
+; M89 vale 1 durante un unico scan; cada carga es una rama independiente
+LDI M505
+OUT M89
+; SP_MINIMO
+LD M89
+MOV K50 D200
+; SP_MAXIMO
+LD M89
+MOV K3500 D201
+; BANDA_TOLERANCIA
+LD M89
+MOV K50 D202
+; TIEMPO_ESTABILIDAD
+LD M89
+MOV K300 D203
+; TIMEOUT_COMM_PV
+LD M89
+MOV K50 D204
+; PV_MIN_PLAUSIBLE
+LD M89
+MOV K-200 D205
+; PV_MAX_PLAUSIBLE
+LD M89
+MOV K5000 D206
+; TIMEOUT_HMI
+LD M89
+MOV K100 D207
+; LIMITE_SOBRETEMP
+LD M89
+MOV K4000 D208
+; TIEMPO_RESET_VFD
+LD M89
+MOV K10 D209
+; Banderas de configuracion por defecto
+LD M89
+SET M504
+LD M89
+SET M506
+LD M89
+SET M507
+LD M89
+SET M505
+
+## SEGMENTO 2 - LECTURA DE ENTRADAS Y SEGURIDAD
+; Cadena de seguridad: X1 es NC, 1 = OK
+LD X1
+OUT M0
+LDI X1
+OUT M1
+LD X7
+OUT M9
+; Pulso de reset (fisico o HMI) y flanco de marcha
+LD X6
+OR M90
+PLS M3
+LD M3
+RST M90
+LD X0
+PLS M21
+; Rearme obligatorio al energizar y ante emergencia. Se libera con reset, cadena OK y X0 = OFF
+LD M8002
+OR M1
+SET M2
+LD M3
+AND M0
+ANI X0
+RST M2
+
+## SEGMENTO 3 - SUPERVISION DE COMUNICACION
+; Latido PV: cualquier cambio de D22 reinicia el timeout T0
+LD<> D22 D23
+OUT M10
+LD M10
+MOV D22 D23
+LDI M10
+OUT T0 D204
+LD T0
+RST M85
+LD M10
+SET M85
+; COMM_PV_OK = (latido visto Y sin timeout) O supervision desactivada
+LD M85
+ANI T0
+ORI M506
+OUT M7
+; Latido HMI: igual, con D20/D21 y T1
+LD<> D20 D21
+OUT M11
+LD M11
+MOV D20 D21
+LDI M11
+OUT T1 D207
+LD T1
+RST M86
+LD M11
+SET M86
+LD M86
+ANI T1
+ORI M507
+OUT M8
+
+## SEGMENTO 4 - ZONA 1
+; Habilitacion: fisica Y solicitud HMI
+LD X2
+AND M500
+OUT M30
+LD M500
+ANI X2
+OUT M31
+LD X2
+OUT M74
+; Validacion de SP y de PV (PV solo valida con comunicacion fresca)
+LD>= D210 D200
+AND<= D210 D201
+OUT M32
+LD M7
+AND>= D0 D205
+AND<= D0 D206
+OUT M33
+; PV para mostrar: dato valido o centinela -9999. Nunca se muestra un dato viejo como actual
+LD M33
+MOV D0 D4
+LDI M33
+MOV K-9999 D4
+; Desvio y valor absoluto
+LD M8000
+SUB D0 D210 D8
+LD M8000
+MOV D8 D12
+LD< D12 K0
+NEG D12
+; Ventana de estabilidad
+LD M33
+AND<= D12 D202
+OUT M34
+LD M34
+OUT T10 D203
+LD T10
+OUT M35
+LD M35
+OR M17
+ORI M504
+OUT M36
+; La zona bloquea solo si esta habilitada. Una zona deshabilitada no bloquea
+LDI M32
+ORI M33
+ORI M36
+AND M30
+OUT M37
+; Alarmas de la zona
+LD M30
+ANI M32
+OUT M38
+LD M30
+ANI M33
+OUT M39
+LD M33
+AND> D0 D208
+OUT M70
+
+## SEGMENTO 5 - ZONA 2
+; Habilitacion: fisica Y solicitud HMI
+LD X3
+AND M501
+OUT M40
+LD M501
+ANI X3
+OUT M41
+LD X3
+OUT M75
+; Validacion de SP y de PV (PV solo valida con comunicacion fresca)
+LD>= D211 D200
+AND<= D211 D201
+OUT M42
+LD M7
+AND>= D1 D205
+AND<= D1 D206
+OUT M43
+; PV para mostrar: dato valido o centinela -9999. Nunca se muestra un dato viejo como actual
+LD M43
+MOV D1 D5
+LDI M43
+MOV K-9999 D5
+; Desvio y valor absoluto
+LD M8000
+SUB D1 D211 D9
+LD M8000
+MOV D9 D13
+LD< D13 K0
+NEG D13
+; Ventana de estabilidad
+LD M43
+AND<= D13 D202
+OUT M44
+LD M44
+OUT T11 D203
+LD T11
+OUT M45
+LD M45
+OR M17
+ORI M504
+OUT M46
+; La zona bloquea solo si esta habilitada. Una zona deshabilitada no bloquea
+LDI M42
+ORI M43
+ORI M46
+AND M40
+OUT M47
+; Alarmas de la zona
+LD M40
+ANI M42
+OUT M48
+LD M40
+ANI M43
+OUT M49
+LD M43
+AND> D1 D208
+OUT M71
+
+## SEGMENTO 6 - ZONA 3
+; Habilitacion: fisica Y solicitud HMI
+LD X4
+AND M502
+OUT M50
+LD M502
+ANI X4
+OUT M51
+LD X4
+OUT M76
+; Validacion de SP y de PV (PV solo valida con comunicacion fresca)
+LD>= D212 D200
+AND<= D212 D201
+OUT M52
+LD M7
+AND>= D2 D205
+AND<= D2 D206
+OUT M53
+; PV para mostrar: dato valido o centinela -9999. Nunca se muestra un dato viejo como actual
+LD M53
+MOV D2 D6
+LDI M53
+MOV K-9999 D6
+; Desvio y valor absoluto
+LD M8000
+SUB D2 D212 D10
+LD M8000
+MOV D10 D14
+LD< D14 K0
+NEG D14
+; Ventana de estabilidad
+LD M53
+AND<= D14 D202
+OUT M54
+LD M54
+OUT T12 D203
+LD T12
+OUT M55
+LD M55
+OR M17
+ORI M504
+OUT M56
+; La zona bloquea solo si esta habilitada. Una zona deshabilitada no bloquea
+LDI M52
+ORI M53
+ORI M56
+AND M50
+OUT M57
+; Alarmas de la zona
+LD M50
+ANI M52
+OUT M58
+LD M50
+ANI M53
+OUT M59
+LD M53
+AND> D2 D208
+OUT M72
+
+## SEGMENTO 7 - ZONA 4
+; Habilitacion: fisica Y solicitud HMI
+LD X5
+AND M503
+OUT M60
+LD M503
+ANI X5
+OUT M61
+LD X5
+OUT M77
+; Validacion de SP y de PV (PV solo valida con comunicacion fresca)
+LD>= D213 D200
+AND<= D213 D201
+OUT M62
+LD M7
+AND>= D3 D205
+AND<= D3 D206
+OUT M63
+; PV para mostrar: dato valido o centinela -9999. Nunca se muestra un dato viejo como actual
+LD M63
+MOV D3 D7
+LDI M63
+MOV K-9999 D7
+; Desvio y valor absoluto
+LD M8000
+SUB D3 D213 D11
+LD M8000
+MOV D11 D15
+LD< D15 K0
+NEG D15
+; Ventana de estabilidad
+LD M63
+AND<= D15 D202
+OUT M64
+LD M64
+OUT T13 D203
+LD T13
+OUT M65
+LD M65
+OR M17
+ORI M504
+OUT M66
+; La zona bloquea solo si esta habilitada. Una zona deshabilitada no bloquea
+LDI M62
+ORI M63
+ORI M66
+AND M60
+OUT M67
+; Alarmas de la zona
+LD M60
+ANI M62
+OUT M68
+LD M60
+ANI M63
+OUT M69
+LD M63
+AND> D3 D208
+OUT M73
+
+## SEGMENTO 8 - RESUMEN DE ZONAS Y LATCHES DE FALLA
+LD M30
+OR M40
+OR M50
+OR M60
+OUT M12
+LD M37
+OR M47
+OR M57
+OR M67
+OUT M13
+LD M70
+OR M71
+OR M72
+OR M73
+OUT M14
+; Falla del variador y sobretemperatura: se enclavan y solo se liberan con reset manual
+LD X7
+SET M6
+LD M3
+ANI X7
+RST M6
+LDF M20
+ANI X7
+RST M6
+LD M14
+SET M87
+LD M3
+ANI M14
+RST M87
+; Reset al variador: pulso de TIEMPO_RESET_VFD si X7 = 1 al pulsar reset
+LD M3
+AND X7
+SET M20
+LD T2
+RST M20
+LD M20
+OUT T2 D209
+LD M20
+OUT Y2
+
+## SEGMENTO 9 - AUTORIZACION GENERAL
+; AUTORIZACION = X0 AND seguridad AND sin rearme AND sin fallas AND >=1 zona AND ninguna zona bloquea AND datos PV frescos
+LD X0
+AND M0
+ANI M2
+ANI M6
+ANI M87
+ANI M14
+AND M12
+ANI M13
+AND M7
+OUT M16
+LD X0
+ANI M16
+OUT M18
+
+## SEGMENTO 10 - CONTROL DEL VARIADOR
+; Arranque solo con flanco de X0 y autorizacion. Cualquier perdida de autorizacion corta y exige nuevo flanco
+LD M21
+AND M16
+SET M17
+LDI M16
+RST M17
+LD M16
+AND M17
+OUT Y0
+; Calentadores: sin emergencia, sin sobretemperatura, con al menos una zona habilitada
+LD M0
+ANI M87
+ANI M14
+AND M12
+OUT Y1
+; Contador de minutos de marcha
+LD M8013
+AND Y0
+INCP D25
+LD>= D25 K60
+INCP D24
+LD>= D25 K60
+MOVP K0 D25
+
+## SEGMENTO 11 - ALARMAS Y DIAGNOSTICO
+LDI M7
+OUT M81
+LDI M8
+OUT M82
+LDI M12
+OUT M84
+; ALARMA_GENERAL
+LD M1
+OR M6
+OR M87
+OR M81
+OR M82
+OR M38
+OR M39
+OR M48
+OR M49
+OR M58
+OR M59
+OR M68
+OR M69
+OUT M19
+LD M19
+OUT Y3
+; MOTIVO_BLOQUEO (D30): se escribe de menor a mayor prioridad; la ultima condicion cierta gana
+LD M8000
+MOV K0 D30
+LDI X0
+MOV K11 D30
+LD M16
+ANI M17
+MOV K12 D30
+LD M67
+MOV K10 D30
+LD M57
+MOV K9 D30
+LD M47
+MOV K8 D30
+LD M37
+MOV K7 D30
+LDI M12
+MOV K5 D30
+LDI M7
+MOV K6 D30
+LD M14
+OR M87
+MOV K4 D30
+LD M6
+MOV K3 D30
+LD M2
+MOV K2 D30
+LD M1
+MOV K1 D30
+; ESTADO_VARIADOR (D31)
+LD M8000
+MOV K0 D31
+LD M18
+MOV K3 D31
+LD Y0
+MOV K1 D31
+LD M6
+OR X7
+MOV K2 D31
+
+## SEGMENTO 12 - ENLACE CON HMI
+; No requiere codigo: la HMI lee/escribe directamente M, D, X, Y listados en docs/variables.csv.
+; Escrituras de la HMI: M500-M504, M90, D200-D213, D0-D3, D20, D22.
+END
